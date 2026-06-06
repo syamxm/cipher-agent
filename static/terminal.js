@@ -1,5 +1,8 @@
+const term = document.getElementById("terminal");
 const screen = document.getElementById("screen");
 const input = document.getElementById("cmd");
+
+const scrollDown = () => { term.scrollTop = term.scrollHeight; };
 
 const state = {
   missions: [],
@@ -15,15 +18,28 @@ function print(text = "", cls = "") {
   line.className = "line " + cls;
   line.textContent = text;
   screen.appendChild(line);
-  screen.scrollTop = screen.scrollHeight;
+  scrollDown();
 }
 
 function echo(raw) {
   const line = document.createElement("div");
   line.className = "line cmd";
-  line.innerHTML = `<span class="ps1">agent$</span>`;
+  line.innerHTML = `<span class="ps1"><span class="user">user@cipher-agent</span> <span class="arrow">-&gt;</span></span> `;
   line.appendChild(document.createTextNode(raw));
   screen.appendChild(line);
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function typeLine(text, cls = "", speed = 16) {
+  const line = document.createElement("div");
+  line.className = "line " + cls;
+  screen.appendChild(line);
+  for (const ch of text) {
+    line.textContent += ch;
+    scrollDown();
+    await sleep(speed);
+  }
 }
 
 // ---- api + crypto helpers ----
@@ -206,10 +222,13 @@ input.addEventListener("keydown", (e) => {
 document.addEventListener("click", () => input.focus());
 
 async function boot() {
-  print("CIPHER AGENT // secure terminal", "accent");
-  print("RSA field operations. type 'help' to begin.", "muted");
+  input.disabled = true;
+  await typeLine("CIPHER AGENT // secure terminal", "accent");
+  await typeLine("RSA field operations. type 'help' to begin.", "muted");
   print("");
   state.missions = await api("/api/missions");
+  input.disabled = false;
+  input.focus();
 }
 
 boot();
