@@ -2,7 +2,9 @@ from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
+from app import game, rsa
 from app.rooms import PadExhausted, RoomFull, RoomManager
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
@@ -14,6 +16,45 @@ rooms = RoomManager()
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/api/key")
+def key():
+    return {"n": rsa.PUBLIC_N, "e": rsa.PUBLIC_E}
+
+
+@app.get("/api/missions")
+def missions():
+    return game.public_missions()
+
+
+class CheckRequest(BaseModel):
+    mission_id: str
+    answer: str
+
+
+@app.post("/api/check")
+def check(req: CheckRequest):
+    correct, points = game.check(req.mission_id, req.answer)
+    return {"correct": correct, "points": points}
+
+
+class RsaRequest(BaseModel):
+    op: str
+    text: str = ""
+
+
+@app.post("/api/rsa")
+def rsa_tool(req: RsaRequest):
+    """In-game RSA device the player uses to solve missions."""
+    if req.op == "encode":
+        return {"result": rsa.text_to_blocks(req.text)}
+    if req.op == "encrypt":
+        return {"result": game.encrypt(req.text)}
+    if req.op == "decrypt":
+        blocks = game._numbers(req.text)
+        return {"result": game.decrypt(blocks)}
+    return {"error": "unknown op"}
 
 
 @app.websocket("/ws")

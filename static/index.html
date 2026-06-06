@@ -7,9 +7,13 @@
   <link rel="stylesheet" href="/app.css">
 </head>
 <body>
-  <main>
-    <h1>Cipher Agent</h1>
-    <p>RSA spy game. Scaffold running.</p>
-  </main>
+  <div id="terminal">
+    <div id="screen" aria-live="polite"></div>
+    <div class="prompt">
+      <span class="ps1" id="ps1">agent$</span>
+      <input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus>
+    </div>
+  </div>
+  <script src="/terminal.js"></script>
 </body>
 </html>
