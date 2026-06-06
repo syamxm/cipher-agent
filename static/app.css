@@ -1,8 +1,9 @@
 :root {
-  --bg: #0c0e12;
-  --text: #d7dbe0;
-  --muted: #6b7280;
-  --accent: #7fd1b9;
+  --bg: #140f1c;
+  --text: #cdc7d6;
+  --muted: #6f6781;
+  --accent: #79c9a8;
+  --arrow: #9a8cc0;
   --you: #8ab4f8;
   --partner: #f0b86e;
   --bad: #e06c6c;
@@ -15,48 +16,70 @@ html, body { height: 100%; margin: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font: 14px/1.55 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* faint terminal wallpaper glow; drop a /bg image and set it here to match a real desktop */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 55% at 50% 42%, rgba(128, 86, 168, 0.20), transparent 70%),
+    radial-gradient(40% 40% at 80% 90%, rgba(70, 120, 140, 0.12), transparent 70%);
+  pointer-events: none;
 }
 
 #terminal {
   height: 100%;
-  max-width: 860px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
+  padding: 1.1rem 1.2rem calc(0.9rem + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  scrollbar-width: none;          /* Firefox */
+}
+
+#terminal::-webkit-scrollbar {     /* Chrome/Safari */
+  width: 0;
+  height: 0;
 }
 
 #screen {
-  flex: 1;
-  overflow-y: auto;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .line { padding: 1px 0; }
-.line.cmd { color: var(--text); }
-.line.cmd .ps1 { color: var(--accent); margin-right: 0.5rem; }
 .muted { color: var(--muted); }
 .accent { color: var(--accent); }
 .bad { color: var(--bad); }
 .you { color: var(--you); }
 .partner { color: var(--partner); }
 
+.ps1 .user { color: var(--accent); }
+.ps1 .arrow { color: var(--arrow); }
+
 .prompt {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.5rem;
-  border-top: 1px solid #1b1f27;
-  padding-top: 0.5rem;
 }
-.ps1 { color: var(--accent); }
 
 #cmd {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;
   color: var(--text);
   font: inherit;
+  caret-color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  body { font-size: 12.5px; line-height: 1.5; }
+  #terminal { padding: 0.7rem 0.75rem calc(0.7rem + env(safe-area-inset-bottom)); }
+  .prompt { gap: 0.35rem; }
 }
