@@ -1,19 +1,19 @@
 # Cipher Agent
 
-A spy game for learning **RSA public-key cryptography**, built for UiTM Cryptography
-Lab 6. The whole thing runs as a fake in-browser terminal: type commands to encode,
-encrypt, and crack intercepts, or open a secure channel and message a partner.
+A small spy game for learning RSA, built for UiTM Cryptography Lab 6. The whole site is
+a fake terminal in the browser: you type commands to encode, encrypt and crack messages,
+or open a secure channel and chat with a partner.
 
 Live at **https://cipher-agent.syamxm.com**.
 
 ## Modes
 
-- **Solo training** — RSA missions with scoring and levels. Encrypt and decrypt in
-  blocks of 4 letters using the friend's public key `n = 1964556481, e = 456899`, with
-  ASCII letter codes (`A=65 .. Z=90`). The private exponent `d` is recovered at runtime
-  by factoring `n` (it is small) — see `app/rsa.py`.
-- **Field channel (2-player)** — pair up in a room and chat through a one-time-pad
-  channel. Each message consumes fresh pad bytes that are never reused.
+- **Solo training** — RSA missions with a score and levels. You encrypt and decrypt in
+  blocks of 4 letters using the friend's public key `n = 1964556481, e = 456899`, where
+  each letter is its ASCII code (`A=65 .. Z=90`). We aren't given `d`, so the game gets it
+  at runtime by factoring `n` (it's small). See `app/rsa.py`.
+- **Field channel (2-player)** — pair up in a room and chat over a one-time pad. Every
+  message eats fresh pad bytes that are never reused.
 
 ## Commands
 
@@ -23,7 +23,7 @@ key               show public key n, e
 missions          list missions + progress
 mission <n>       show a mission
 encode <letters>  letters -> number blocks
-encrypt <letters> encrypt: m^e mod n
+encrypt <input>   encrypt letters or blocks: m^e mod n
 decrypt <nums>    decrypt: c^d mod n
 submit <answer>   answer the current mission
 score             show score
@@ -52,29 +52,28 @@ pytest
 ## Deploy
 
 The app runs as a container on the shared `proxy-net` network, behind an nginx reverse
-proxy fronted by a Cloudflare tunnel.
+proxy and a Cloudflare tunnel.
 
-1. Build and start the container:
+1. Build and start it:
 
    ```bash
    docker compose up -d --build
    ```
 
-2. Add the nginx server block for `cipher-agent.syamxm.com` from
-   [`deploy/nginx-x.conf.example`](deploy/nginx-x.conf.example) to your proxy config and
-   reload nginx. The `/ws` location carries the WebSocket upgrade headers the field
-   channel needs.
+2. Copy the server block from [`deploy/nginx-x.conf.example`](deploy/nginx-x.conf.example)
+   into your nginx config and reload. The `/ws` block carries the WebSocket upgrade
+   headers the field channel needs.
 
-3. Map `cipher-agent.syamxm.com` in your Cloudflare tunnel (DNS + tunnel ingress) so it
-   routes to the nginx proxy.
+3. Point `cipher-agent.syamxm.com` at the nginx proxy in your Cloudflare tunnel (DNS +
+   ingress).
 
 ## Security note
 
-This is a teaching game, not a secure messenger:
+This is a learning game, not a real secure messenger:
 
-- The lab RSA key is tiny and factorable in milliseconds — fine for learning, useless
-  for real protection.
-- The one-time pad gives perfect secrecy only when the pad is random, secret, and used
-  once. Here the **server generates and hands the pad to both players**, so the channel
-  is secure against other players and passive eavesdroppers, but **not against the
-  server**. Pads and rooms are in memory and disappear on restart.
+- The lab RSA key is tiny and factors in milliseconds. Good for learning, useless for
+  real protection.
+- A one-time pad is only safe if the pad is random, secret, and used once. Here the
+  **server makes the pad and hands it to both players**, so the channel is safe against
+  other players and someone just sniffing traffic, but **not against the server itself**.
+- Pads and rooms live in memory and are gone on restart.

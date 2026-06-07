@@ -134,8 +134,6 @@ function handleChannel(msg) {
     ch.cursor = 0;
     ch.ready = true;
     print("secure channel up. one-time pad shared. type 'send <message>'.", "accent");
-  } else if (msg.type === "sent") {
-    // server confirmed our pad offset; local echo already printed
   } else if (msg.type === "msg") {
     const cipher = fromHex(msg.cipher);
     const text = dec.decode(xor(cipher, ch.pad, msg.offset));
@@ -190,7 +188,7 @@ FIELD CHANNEL (2-player, one-time pad)
 async function run(raw) {
   const line = raw.trim();
   if (!line) return;
-  const [cmd, ...rest] = line.split(/\s+/);
+  const cmd = line.split(/\s+/)[0];
   const arg = line.slice(cmd.length).trim();
 
   switch (cmd) {

@@ -1,9 +1,8 @@
-"""In-memory two-player rooms, each holding one shared one-time pad.
+"""In-memory two-player rooms, each with one shared one-time pad.
 
-State is ephemeral (lost on restart) — fine for a game. The pad is split into two
-halves, one per player, so the two players never draw from the same bytes. Within a
-half, bytes are handed out strictly forward, so no byte is ever reused. Together this
-keeps the one-time-pad property: every message uses fresh, unique key bytes.
+State is lost on restart, which is fine for a game. The pad is split in half, one half
+per player, and each half is used strictly front-to-back. So no byte is ever reused and
+the one-time-pad rule holds.
 """
 
 import secrets
@@ -47,10 +46,9 @@ class Room:
         return len(self.members) - 1   # the player's index
 
     def allocate(self, index, length):
-        """Reserve `length` fresh pad bytes for player `index`, return their offset.
+        """Reserve `length` fresh pad bytes for player `index`, return the offset.
 
-        Walks forward inside that player's half only, so the returned range never
-        overlaps a previous one (this message or the other player's).
+        Only moves forward inside that player's half, so ranges never overlap.
         """
         if self.used[index] + length > self.half:
             raise PadExhausted()

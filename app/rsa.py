@@ -1,7 +1,6 @@
-"""RSA in blocks of 4 letters, using ASCII letter codes (A=65 .. Z=90).
+"""RSA on blocks of 4 letters using ASCII codes (A=65..Z=90).
 
-The friend's public key from the lab. The private exponent `d` is not given, so we
-recover it by factoring `n` (it is small enough to factor instantly).
+Public key is from the lab. We aren't given d, so we just factor n (it's small) to get it.
 """
 
 PUBLIC_N = 1964556481
@@ -13,11 +12,7 @@ CODE_DIGITS = 2            # each ASCII code 65..90 is exactly 2 digits
 
 
 def modexp(base, exp, mod):
-    """Modular exponentiation: (base ** exp) % mod, by square-and-multiply.
-
-    Walks the bits of `exp`, squaring the running base each step and multiplying it
-    into the result when the current bit is 1. Keeps every value small via `% mod`.
-    """
+    """(base ** exp) % mod by square-and-multiply, so the numbers stay small."""
     result = 1
     base %= mod
     while exp > 0:
@@ -29,15 +24,11 @@ def modexp(base, exp, mod):
 
 
 def derive_d(n=PUBLIC_N, e=PUBLIC_E):
-    """Recover the private exponent d from the public key.
-
-    Factor n = p * q by trial division, then d = e^-1 mod phi, where
-    phi = (p-1)(q-1). This is only feasible because the lab's n is tiny.
-    """
+    """Get the private key d. Factor n into p*q, then d = e^-1 mod phi."""
     p = _smallest_factor(n)
     q = n // p
     phi = (p - 1) * (q - 1)
-    return pow(e, -1, phi)  # modular inverse of e modulo phi
+    return pow(e, -1, phi)
 
 
 def _smallest_factor(n):
@@ -50,11 +41,9 @@ def _smallest_factor(n):
 
 
 def text_to_blocks(text):
-    """Turn text into a list of integer blocks.
+    """Text -> integer blocks. Keep A-Z, pad last group with X, join 2-digit ASCII codes.
 
-    Keep only A-Z (drops spaces/punctuation), pad the last group to 4 letters with
-    'X', then encode each group of 4 letters as the integer formed by concatenating
-    their 2-digit ASCII codes (e.g. UITM -> 85 73 84 77 -> 85738477).
+    e.g. UITM -> 85 73 84 77 -> 85738477.
     """
     letters = [c for c in text.upper() if "A" <= c <= "Z"]
     while len(letters) % BLOCK_LETTERS != 0:
@@ -71,11 +60,11 @@ def text_to_blocks(text):
 
 
 def blocks_to_text(blocks):
-    """Inverse of text_to_blocks: integer blocks back into letters."""
+    """Reverse of text_to_blocks: integer blocks back into letters."""
     digits = CODE_DIGITS * BLOCK_LETTERS  # 8 digits per block
     chars = []
     for block in blocks:
-        s = str(block).zfill(digits)      # guard against any dropped leading digit
+        s = str(block).zfill(digits)      # pad back to 8 in case a leading digit was dropped
         for i in range(0, digits, CODE_DIGITS):
             chars.append(chr(int(s[i:i + CODE_DIGITS])))
     return "".join(chars)
