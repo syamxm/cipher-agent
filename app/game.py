@@ -20,6 +20,16 @@ def encrypt(text):
     return rsa.encrypt(rsa.text_to_blocks(text))
 
 
+def input_blocks(text):
+    """Parse user input into number blocks: letters get encoded, digits are taken as-is.
+
+    Lets the pipeline flow either way: `encrypt hello` or `encrypt 72697676 79888888`.
+    """
+    if any(c.isalpha() for c in text):
+        return rsa.text_to_blocks(text)
+    return _numbers(text)
+
+
 def decrypt(blocks):
     return rsa.blocks_to_text(rsa.decrypt(blocks, _D))
 

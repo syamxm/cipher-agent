@@ -48,12 +48,14 @@ class RsaRequest(BaseModel):
 def rsa_tool(req: RsaRequest):
     """In-game RSA device the player uses to solve missions."""
     if req.op == "encode":
-        return {"result": rsa.text_to_blocks(req.text)}
+        blocks = rsa.text_to_blocks(req.text)
+        return {"result": blocks} if blocks else {"error": "no letters to encode"}
     if req.op == "encrypt":
-        return {"result": game.encrypt(req.text)}
+        blocks = game.input_blocks(req.text)
+        return {"result": rsa.encrypt(blocks)} if blocks else {"error": "give letters or number blocks"}
     if req.op == "decrypt":
         blocks = game._numbers(req.text)
-        return {"result": game.decrypt(blocks)}
+        return {"result": game.decrypt(blocks)} if blocks else {"error": "give number blocks"}
     return {"error": "unknown op"}
 
 
