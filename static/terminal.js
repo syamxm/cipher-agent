@@ -90,6 +90,7 @@ function showMission(i) {
 async function cmdRsa(op, text) {
   if (!text) return print(`usage: ${op} <input>`, "bad");
   const out = await api("/api/rsa", { op, text });
+  if (out.error) return print(out.error, "bad");
   print(Array.isArray(out.result) ? out.result.join(" ") : out.result, "accent");
 }
 
@@ -174,7 +175,7 @@ const HELP = `SOLO
   missions          list missions + progress
   mission <n>       show a mission
   encode <letters>  letters -> number blocks
-  encrypt <letters> encrypt: m^e mod n
+  encrypt <input>   encrypt letters or blocks: m^e mod n
   decrypt <nums>    decrypt: c^d mod n
   submit <answer>   answer the current mission
   score             show score
