@@ -13,7 +13,7 @@ app = FastAPI(title="Cipher Agent")
 rooms = RoomManager()
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health():
     return {"status": "ok"}
 
