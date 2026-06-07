@@ -1,7 +1,7 @@
-"""Single-player missions: the spy must encode, encrypt, and decrypt with RSA.
+"""Single-player missions: encode, encrypt and decrypt with RSA.
 
-Each mission has a hidden answer computed from the real RSA functions. The player
-uses the in-game RSA tools (see the /api/rsa endpoint) to work it out, then submits.
+Each mission's answer is computed from the real RSA functions. The player works it out
+with the in-game tools (/api/rsa) and submits.
 """
 
 import re
@@ -21,9 +21,9 @@ def encrypt(text):
 
 
 def input_blocks(text):
-    """Parse user input into number blocks: letters get encoded, digits are taken as-is.
+    """Letters get encoded first, plain numbers are used as-is.
 
-    Lets the pipeline flow either way: `encrypt hello` or `encrypt 72697676 79888888`.
+    So both `encrypt hello` and `encrypt 72697676 79888888` work.
     """
     if any(c.isalpha() for c in text):
         return rsa.text_to_blocks(text)

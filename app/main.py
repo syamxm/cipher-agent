@@ -46,7 +46,7 @@ class RsaRequest(BaseModel):
 
 @app.post("/api/rsa")
 def rsa_tool(req: RsaRequest):
-    """In-game RSA device the player uses to solve missions."""
+    """RSA tool the player uses to solve missions."""
     if req.op == "encode":
         blocks = rsa.text_to_blocks(req.text)
         return {"result": blocks} if blocks else {"error": "no letters to encode"}
@@ -63,10 +63,9 @@ def rsa_tool(req: RsaRequest):
 async def ws(socket: WebSocket):
     """Relay one-time-pad messages between the two players in a room.
 
-    First message from a client is either {"action":"create"} or
-    {"action":"join","code":...}. Once both players are in, each side gets the shared
-    pad. Later {"action":"msg","cipher":hex} messages are relayed to the partner with
-    the pad offset the server reserved for them.
+    First client message is {"action":"create"} or {"action":"join","code":...}. Once
+    both are in, each side gets the shared pad. After that {"action":"msg","cipher":hex}
+    messages are passed to the partner with the pad offset the server reserved.
     """
     await socket.accept()
     room = None
