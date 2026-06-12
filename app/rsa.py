@@ -16,9 +16,9 @@ def modexp(base, exp, mod):
     result = 1
     base %= mod
     while exp > 0:
-        if exp & 1:
+        if exp & 1:                       # odd bit set: fold this power into the result
             result = (result * base) % mod
-        base = (base * base) % mod
+        base = (base * base) % mod        # square for the next bit
         exp >>= 1
     return result
 
@@ -28,7 +28,7 @@ def derive_d(n=PUBLIC_N, e=PUBLIC_E):
     p = _smallest_factor(n)
     q = n // p
     phi = (p - 1) * (q - 1)
-    return pow(e, -1, phi)
+    return pow(e, -1, phi)  # d*e = 1 (mod phi)
 
 
 def _smallest_factor(n):
@@ -54,6 +54,7 @@ def text_to_blocks(text):
         group = letters[i:i + BLOCK_LETTERS]
         block = 0
         for c in group:
+            # shift left two digits, then append this letter's ASCII code
             block = block * (10 ** CODE_DIGITS) + ord(c)
         blocks.append(block)
     return blocks
