@@ -60,9 +60,9 @@ proxy and a Cloudflare tunnel.
    docker compose up -d --build
    ```
 
-2. Copy the server block from [`deploy/nginx-x.conf.example`](deploy/nginx-x.conf.example)
-   into your nginx config and reload. The `/ws` block carries the WebSocket upgrade
-   headers the field channel needs.
+2. Copy the files in [`deploy/conf.d/`](deploy/conf.d/) into your nginx `conf.d/`
+   and reload. The proxy_params snippet plus the upgrade
+   map in `00-maps.conf` carry the WebSocket headers the field channel needs.
 
 3. Point `cipher-agent.syamxm.com` at the nginx proxy in your Cloudflare tunnel (DNS +
    ingress).

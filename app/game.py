@@ -8,7 +8,7 @@ import re
 
 from app import rsa
 
-MANDATORY = "I AM AN UNDERCOVER SPY AT UITM"
+MANDATORY = "I AM AN UNDERCOVER SPY AT UITM"  # the message the lab requires us to send
 _D = rsa.derive_d()
 
 
